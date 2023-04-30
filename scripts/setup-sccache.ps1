@@ -6,9 +6,7 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$uri
 )
-if (Test-Path $ParentDir) {
-    rm -force $ParentDir
-}
+
 Invoke-Webrequest -Uri $uri -OutFile sccache.zip
 tar -xvzf sccache.zip -C $ParentDir
 ls $ParentDir/$FileName
