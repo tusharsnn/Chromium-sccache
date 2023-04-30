@@ -32,6 +32,8 @@ $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
 $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
 # '&' in the front let's us run an executable.
 $env:vs2022_install = "$(& $vswhere -property installationPath)"
+echo "vs2022_install=$env:vs2022_install" >> "$GITHUB_ENV"
+
 echo ${env:path}
 echo ${env:DEPOT_TOOLS_WIN_TOOLCHAIN}
 echo ${env:vs2022_install}
@@ -41,11 +43,11 @@ Setup-Git -user $GitUser -email $GitMail
 # setup sccache
 .\scripts\setup-sccache.ps1 -ParentDir $env:userprofile `
     -FileName $SCCACHE_FILENAME -Uri $SCCACHE_URI
-$env:SCCACHE_DIR="$CHROMIUM_PATH\sccache"
-$env:SCCACHE_CACHE_SIZE="20G"
+
+
 $env:Path += ";$SCCACHE_TOOL_PATH"
-echo ${env:SCCACHE_CACHE_SIZE}
-echo ${env:SCCACHE_DIR}
+echo "PATH=$env:PATH" >> "$GITHUB_ENV"
+
 
 # fetch chromium checkout
 Write-Host "Starting chromium checkout"
