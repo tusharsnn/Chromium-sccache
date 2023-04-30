@@ -1,0 +1,28 @@
+name: Building chromium 
+on: workflow_dispatch
+jobs:
+  build-chromium:
+    permissions:
+      contents: write
+    name: build
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build
+        run: >
+          . .\scripts\run.ps1 -GitUser "{{ SECRETS.GITUSER }}"
+          -GitMail "{{ SECRETS.GITMAIL }}"
+
+      - name: Start Build
+        run: cd chromium\src && autoninja -C out\Default chrome
+
+      - name: Display Cache Stats
+        run: >
+          "$((Get-ChildItem chromium\sccache | Measure-Object -Property Length -Sum).Sum/1MB) in MB"
+
+      - name: Release Sccache Cache 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: chromium\sccache
