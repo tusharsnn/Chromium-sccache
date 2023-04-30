@@ -20,11 +20,11 @@ function Setup-Git {
 }
 
 $DEPOT_TOOLS_URI = "https://storage.googleapis.com/chrome-infra/depot_tools.zip"
-$DEPOT_TOOLS_PATH = "$env:USERPROFILE\depot_tools"
-$CHROMIUM_PATH = "$env:USERPROFILE\chromium"
+$DEPOT_TOOLS_PATH = "$env:GITHUB_WORKSPACE\depot_tools"
+$CHROMIUM_PATH = "$env:GITHUB_WORKSPACE\chromium"
 $SCCACHE_FILENAME = "sccache-v0.4.2-x86_64-pc-windows-msvc" 
 $SCCACHE_URI = "https://github.com/mozilla/sccache/releases/download/v0.4.2/sccache-v0.4.2-x86_64-pc-windows-msvc.tar.gz"
-$SCCACHE_TOOL_PATH = "$env:USERPROFILE\$SCCACHE_FILENAME"
+$SCCACHE_TOOL_PATH = "$env:GITHUB_WORKSPACE\$SCCACHE_FILENAME"
 
 .\scripts\depot-tools.ps1 -Path $DEPOT_TOOLS_PATH -Uri $DEPOT_TOOLS_URI
 $env:PATH = "$DEPOT_TOOLS_PATH;$env:PATH" 
@@ -52,7 +52,7 @@ Write-Host "Starting chromium checkout"
 mkdir $CHROMIUM_PATH && cd $CHROMIUM_PATH
 fetch --no-history chromium
 Write-Host "Checkout complete"
-ls chromium/src
+ls $CHROMIUM_PATH/src
 
 cd src
 gn gen out\Default `
