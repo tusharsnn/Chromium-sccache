@@ -16,7 +16,7 @@ jobs:
           -GitMail "{{ SECRETS.GITMAIL }}"
 
       - name: Start Build
-        run: cd chromium\src && autoninja -C out\Default chrome
+        run: cd $env:USERPROFILE\chromium\src && autoninja -C out\Default chrome
 
       - name: Display Cache Stats
         run: >
