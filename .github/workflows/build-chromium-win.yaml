@@ -12,11 +12,18 @@ jobs:
 
       - name: Setup Build
         run: >
-          . .\scripts\run.ps1 -GitUser "{{ SECRETS.GITUSER }}"
+          .\scripts\run.ps1 -GitUser "{{ SECRETS.GITUSER }}"
           -GitMail "{{ SECRETS.GITMAIL }}"
 
       - name: Start Build
-        run: cd $env:USERPROFILE\chromium\src && autoninja -C out\Default chrome
+        working-directory: chromium\src
+        run: autoninja -C out\Default chrome
+        env:
+          PATH: ${{ env.PATH }}
+          DEPOT_TOOLS_WIN_TOOLCHAIN: "0"
+          vs2022_install: ${{ env.vs2022_install }}
+          SCCACHE_CACHE_SIZE: "20G"
+          SCCACHE_DIR: 'chromium\sccache'
 
       - name: Display Cache Stats
         run: >
