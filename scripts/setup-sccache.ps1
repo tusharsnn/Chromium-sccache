@@ -1,14 +1,6 @@
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$ParentDir,
-    [Parameter(Mandatory=$true)]
-    [string]$FileName,
-    [Parameter(Mandatory=$true)]
-    [string]$uri
-)
-
-Invoke-Webrequest -Uri $uri -OutFile sccache.zip
-tar -xvzf sccache.zip -C $ParentDir
-ls $ParentDir/$FileName
-rm -force sccache.zip
+Invoke-Webrequest -Uri $env:SCCACHE_URI -OutFile sccache.tar.gz
+tar -xvzf sccache.tar.gz -C "$env:SCCACHE_TOOL_PATH\.."
+ls "$env:SCCACHE_TOOL_PATH/$env:SCCACHE_FILENAME"
+rm -force sccache.tar.gz
+echo "$env:SCCACHE_TOOL_PATH" >> "$env:GITHUB_PATH"
 Write-Host "sccache installed"
