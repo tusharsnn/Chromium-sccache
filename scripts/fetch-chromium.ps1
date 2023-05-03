@@ -5,16 +5,15 @@ git config --global core.filemode false
 git config --global branch.autosetuprebase always
 
 # setup depot_tools
-.\scripts\depot-tools.ps1 -Path $env:DEPOT_TOOLS_PATH -Uri $env:DEPOT_TOOLS_URI
-echo "$env:DEPOT_TOOLS_PATH" >> "$env:GITHUB_PATH"
+.\scripts\setup-depot-tools.ps1
 
 # fetch chromium checkout
 mkdir $env:CHROMIUM_PATH && cd $env:CHROMIUM_PATH
-fetch --no-history chromium
+& "$env:DEPOT_TOOLS_PATH\fetch" --no-history chromium
 ls $env:CHROMIUM_PATH\src
 
 cd $env:CHROMIUM_PATH\src
-gn gen out\Default `
+& "$env:DEPOT_TOOLS_PATH\gn" gen out\Default `
     --args="is_component_build = true" `
     --args="enable_nacl = false" `
     --args="target_cpu = x86" `
