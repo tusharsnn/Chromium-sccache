@@ -3,7 +3,7 @@ import time
 import sys
 import signal
 import os
-from scripts.utils import write_github_output
+from utils import write_github_output
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
