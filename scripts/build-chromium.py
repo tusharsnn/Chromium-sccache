@@ -60,7 +60,7 @@ def _run_build_process_timeout(timeout) -> bool:
     # autoninja -C out\Default chrome
     # TODO: add correct commands
     with subprocess.Popen(
-            (shutil.which("autoninja.bat"), "-C", "out\\Default", "chromium"), encoding="UTF-8", 
+            (shutil.which("autoninja.bat"), "-C", "out\\Default", "chrome"), encoding="UTF-8", 
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP, 
             cwd="{}\\src".format(chromium_path)
         ) as proc:
