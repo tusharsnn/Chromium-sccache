@@ -27,6 +27,9 @@ jobs:
         
       - name: Pre Volume Details
         run: Get-Volume
+      
+      - name: Setup Build Tools
+        run: py3.11 .\scripts\setup-build-tools.py
 
       - name: Fetch Chromium
         run: .\scripts\fetch-chromium.ps1
@@ -64,6 +67,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: py3.11 .\scripts\setup-build-tools.py
 
       # Reuse artifact from previou job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
@@ -114,6 +120,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: py3.11 .\scripts\setup-build-tools.py
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.

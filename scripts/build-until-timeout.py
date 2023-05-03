@@ -5,16 +5,6 @@ import signal
 import os
 from scripts.utils import write_github_output
 
-
-def setup_build_tools():
-    print("Setting up Depot tools")
-    _ = subprocess.run(
-        ["pwsh.exe", ".\\scripts\\setup-depot-tools.ps1"],
-        check=True
-    )
-    print('Setting up Sccache')
-    _ = subprocess.run(["pwsh.exe", ".\\scripts\\setup-sccache.ps1"], check=True)
-
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
 def archive_dir(path):
@@ -82,7 +72,6 @@ def main():
         # continuing build from the previous job within the same workflow.
         extract_dir(chromium_path)
 
-    setup_build_tools()
     finished = _run_build_process_timeout(timeout=5*60*60)
     # write 'finished=true' to use it as github action output.
     if finished:
