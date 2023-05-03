@@ -3,6 +3,8 @@ import time
 import sys
 import signal
 import os
+import shutil
+
 from utils import write_github_output
 
 # we need to archive artifacts before uploading to avoid upload
@@ -11,7 +13,7 @@ def archive_dir(path):
     print('Archiving build directory')
     _ = subprocess.run(
         [
-            "7z", "a", "-tzip", "{}.zip".format(path),
+            shutil.which("7z.exe"), "a", "-tzip", "{}.zip".format(path),
             "{}".format(path), "-mx=3", "-mtc=on"
         ],
         check=True
@@ -21,7 +23,7 @@ def extract_dir(path):
     print('Extracting build directory')
     _ = subprocess.run(
         [
-            "7z", "x", "{}.zip".format(path),
+            shutil.which("7z.exe"), "x", "{}.zip".format(path),
             "-o{}\\..".format(path), # this is parent dir of archived dir
         ],
         check=True
@@ -58,7 +60,7 @@ def _run_build_process_timeout(timeout) -> bool:
     # autoninja -C out\Default chrome
     # TODO: add correct commands
     with subprocess.Popen(
-            ("autoninja", "-C", "out\\Default", "chromium"), encoding="utf-8", 
+            (shutil.which("autoninja.bat"), "-C", "out\\Default", "chromium"), encoding="UTF-8", 
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP, 
             cwd="{}\\src".format(chromium_path)
         ) as proc:
