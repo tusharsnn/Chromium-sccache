@@ -19,7 +19,6 @@ def archive_dir(path):
             (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", "{}.zip".format(path),
             "{}".format(path), "-mx=3", "-mtc=on"
         ],
-        check=True
     )
 
 def extract_dir(path):
@@ -29,7 +28,6 @@ def extract_dir(path):
             (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
             "-o{}\\..".format(path), # this is parent dir of archived dir
         ],
-        check=True
     )
     os.remove("{}.zip".format(path))
 
