@@ -74,7 +74,7 @@ def main():
         # continuing build from the previous job within the same workflow.
         extract_dir(chromium_path)
 
-    finished = _run_build_process_timeout(timeout=5*60*60)
+    finished = _run_build_process_timeout(timeout=4.5*60*60)
     # write 'finished=true' to use it as github action output.
     if finished:
         # archive sccache cache directory and 
