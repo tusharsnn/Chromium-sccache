@@ -13,7 +13,7 @@ def archive_dir(path):
     print('Archiving build directory')
     _ = subprocess.run(
         [
-            shutil.which("7z.exe"), "a", "-tzip", "{}.zip".format(path),
+            (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", "{}.zip".format(path),
             "{}".format(path), "-mx=3", "-mtc=on"
         ],
         check=True
@@ -23,7 +23,7 @@ def extract_dir(path):
     print('Extracting build directory')
     _ = subprocess.run(
         [
-            shutil.which("7z.exe"), "x", "{}.zip".format(path),
+            (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
             "-o{}\\..".format(path), # this is parent dir of archived dir
         ],
         check=True
@@ -60,7 +60,7 @@ def _run_build_process_timeout(timeout) -> bool:
     # autoninja -C out\Default chrome
     # TODO: add correct commands
     with subprocess.Popen(
-            (shutil.which("autoninja.bat"), "-C", "out\\Default", "chrome"), encoding="UTF-8", 
+            ((shutil.which("autoninja.bat") or "autoninja.bat"), "-C", "out\\Default", "chrome"), encoding="UTF-8", 
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP, 
             cwd="{}\\src".format(chromium_path)
         ) as proc:
