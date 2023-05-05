@@ -4,11 +4,13 @@ import time
 import sys
 import os
 import shutil
+from pathlib import Path
 
 from utils import write_github_output
 
 
-MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = int(os.getenv("MAX_BUILD_TIME", 4*60*60))
+MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = int(os.getenv("MAX_BUILD_TIME", 5*60))
+print("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN_SEC // 60))
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
@@ -26,7 +28,7 @@ def extract_dir(path):
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
-            "-o{}\\..".format(path), # this is parent dir of archived dir
+            "-o{}".format(Path(path).parent), # this is parent dir of archived dir
         ],
     )
     os.remove("{}.zip".format(path))
@@ -41,11 +43,11 @@ def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
             ctypes.windll.kernel32.GenerateConsoleCtrlEvent(1, proc.pid)
             time.sleep(1)
         try:
+            print("\nwaiting for process to finish on its own")
             proc.wait(10)
-            print("waiting for process to finish on its own")
         except:
             proc.kill()
-            print("had to kill the build process")
+            print("\nhad to kill the build process")
     else:
         is_finished = True
 
