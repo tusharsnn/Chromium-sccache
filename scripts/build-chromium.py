@@ -1,3 +1,4 @@
+import ctypes
 import subprocess
 import time
 import sys
@@ -6,6 +7,8 @@ import os
 import shutil
 
 from utils import write_github_output
+
+MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = 5*60
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
@@ -37,12 +40,14 @@ def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     except subprocess.TimeoutExpired:
         print("pausing execution of process {}", proc.pid)
         for _ in range(3):
-            proc.send_signal(signal.CTRL_C_EVENT)
+            ctypes.windll.kernel32.GenerateConsoleCtrlEvent(1, proc.pid)
             time.sleep(1)
         try:
             proc.wait(10)
+            print("waiting for process to finish on its own")
         except:
             proc.kill()
+            print("had to kill the build process")
     else:
         is_finished = True
 
@@ -58,9 +63,14 @@ def _run_build_process_timeout(timeout) -> bool:
 
     # cd $env:CHROMIUM_PATH\src 
     # autoninja -C out\Default chrome
-    # TODO: add correct commands
     with subprocess.Popen(
-            ((shutil.which("autoninja.bat") or "autoninja.bat"), "-C", "out\\Default", "chrome"), encoding="UTF-8", 
+            (
+                (shutil.which("autoninja.bat") or "autoninja.bat"), 
+                "-C", 
+                "out\\Default", 
+                "chrome"
+            ),
+            encoding="UTF-8",
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP, 
             cwd="{}\\src".format(chromium_path)
         ) as proc:
@@ -74,7 +84,9 @@ def main():
         # continuing build from the previous job within the same workflow.
         extract_dir(chromium_path)
 
-    finished = _run_build_process_timeout(timeout=4.5*60*60)
+    finished = _run_build_process_timeout(
+        timeout=MAX_GITHUB_ACTION_RUN_TIME_IN_SEC
+    )
     # write 'finished=true' to use it as github action output.
     if finished:
         # archive sccache cache directory and 
