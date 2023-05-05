@@ -33,7 +33,7 @@ jobs:
 
       - name: Fetch Chromium
         run: .\scripts\fetch-chromium.ps1
-        shell: powershell.exe
+        shell: powershell
 
       - name: Post Volume Details
         run: Get-Volume
