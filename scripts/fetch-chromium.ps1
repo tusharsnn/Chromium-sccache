@@ -5,7 +5,8 @@ git config --global core.filemode false
 git config --global branch.autosetuprebase always
 
 # fetch chromium checkout
-mkdir $env:CHROMIUM_PATH && cd $env:CHROMIUM_PATH
+mkdir $env:CHROMIUM_PATH
+cd $env:CHROMIUM_PATH 
 fetch --no-history chromium
 ls $env:CHROMIUM_PATH\src
 
