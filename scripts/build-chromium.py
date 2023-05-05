@@ -2,13 +2,13 @@ import ctypes
 import subprocess
 import time
 import sys
-import signal
 import os
 import shutil
 
 from utils import write_github_output
 
-MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = 5*60
+
+MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = int(os.getenv("MAX_BUILD_TIME", 4*60*60))
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
@@ -36,7 +36,7 @@ def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     try:
         proc.wait(timeout)
     except subprocess.TimeoutExpired:
-        print("pausing execution of process {}", proc.pid)
+        print("pausing execution of process {}".format(proc.pid))
         for _ in range(3):
             ctypes.windll.kernel32.GenerateConsoleCtrlEvent(1, proc.pid)
             time.sleep(1)
@@ -85,16 +85,14 @@ def main():
     finished = _run_build_process_timeout(
         timeout=MAX_GITHUB_ACTION_RUN_TIME_IN_SEC
     )
-    # write 'finished=true' to use it as github action output.
+
+    sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
     if finished:
-        # archive sccache cache directory and 
-        # write 'finished=true' to use it as github action output.
-        sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
         archive_dir(sccache_cache_path)
         write_github_output("finished", "true")
     else:
-        # archive chromium directory with partial build.
         archive_dir(chromium_path)
+        archive_dir(sccache_cache_path)
         write_github_output("finished", "false")
     
     return 0

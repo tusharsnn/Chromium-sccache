@@ -42,19 +42,19 @@ jobs:
         id: build
         run: python3 .\scripts\build-chromium.py
      
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
+
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
           path: "${{ env.CHROMIUM_PATH }}.zip"
-        
-      - name: Upload Sccache Cache
-        if: ${{ steps.build.outputs.finished == 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+       
     
 
   build-2:
@@ -78,7 +78,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\chromium.zip" 
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache 
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
  
       - name: Build
         id: build
@@ -87,9 +93,11 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
-      - name: Display Cache Stats
-        run: >
-          "$((Get-ChildItem ${{ env.SCCACHE_DIR }} | Measure-Object -Property Length -Sum).Sum/1MB) in MB"
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
@@ -98,17 +106,6 @@ jobs:
           name: chromium
           path: "${{ env.CHROMIUM_PATH }}.zip"
         
-      - name: Upload Sccache Cache
-        if: ${{ steps.build.outputs.finished == 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
-
-      # - name: Release Sccache Cache 
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: ${{ env.SCCACHE_DIR }} 
 
   build-3:
     if: ${{ needs.build-2.outputs.finished != 'true' }}
@@ -133,6 +130,12 @@ jobs:
           name: chromium
           path: "${{ env.CHROMIUM_PATH }}.zip" 
 
+      - name: Download Sccache Cache 
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
       - name: Build
         id: build
         run: python3 .\scripts\build-chromium.py
@@ -140,9 +143,11 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
-      - name: Display Cache Stats
-        run: >
-          "$((Get-ChildItem ${{ env.SCCACHE_DIR }} | Measure-Object -Property Length -Sum).Sum/1MB) in MB"
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
@@ -151,9 +156,249 @@ jobs:
           name: chromium
           path: "${{ env.CHROMIUM_PATH }}.zip"
         
+
+  build-4:
+    if: ${{ needs.build-3.outputs.finished != 'true' }}
+    needs: build-3
+    runs-on: windows-2022
+
+    outputs:
+      finished: ${{ steps.build.outputs.finished }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: python3 .\scripts\setup-build-tools.py
+
+      # Reuse artifact from previous job. This also avoid the need to checkout 
+      # source code again, helps in incremental build.
+      - name: Download Partially Built Chromium 
+        uses: actions/download-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache 
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
+      - name: Build
+        id: build
+        run: python3 .\scripts\build-chromium.py
+
+      - name: Volume Details
+        run: Get-Volume
+
       - name: Upload Sccache Cache
-        if: ${{ steps.build.outputs.finished == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
           path: "${{ env.SCCACHE_DIR }}.zip"
+
+      - name: Upload Partial Built Chromium
+        if: ${{ steps.build.outputs.finished != 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip"
+
+
+  build-5:
+    if: ${{ needs.build-4.outputs.finished != 'true' }}
+    needs: build-4
+    runs-on: windows-2022
+
+    outputs:
+      finished: ${{ steps.build.outputs.finished }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: python3 .\scripts\setup-build-tools.py
+
+      # Reuse artifact from previous job. This also avoid the need to checkout 
+      # source code again, helps in incremental build.
+      - name: Download Partially Built Chromium 
+        uses: actions/download-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache 
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
+      - name: Build
+        id: build
+        run: python3 .\scripts\build-chromium.py
+
+      - name: Volume Details
+        run: Get-Volume
+
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
+
+      - name: Upload Partial Built Chromium
+        if: ${{ steps.build.outputs.finished != 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip"
+
+  build-6:
+    if: ${{ needs.build-5.outputs.finished != 'true' }}
+    needs: build-5
+    runs-on: windows-2022
+
+    outputs:
+      finished: ${{ steps.build.outputs.finished }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: python3 .\scripts\setup-build-tools.py
+
+      # Reuse artifact from previous job. This also avoid the need to checkout 
+      # source code again, helps in incremental build.
+      - name: Download Partially Built Chromium 
+        uses: actions/download-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
+      - name: Build
+        id: build
+        run: python3 .\scripts\build-chromium.py
+
+      - name: Volume Details
+        run: Get-Volume
+
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
+
+      - name: Upload Partial Built Chromium
+        if: ${{ steps.build.outputs.finished != 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip"
+
+  build-7:
+    if: ${{ needs.build-6.outputs.finished != 'true' }}
+    needs: build-6
+    runs-on: windows-2022
+
+    outputs:
+      finished: ${{ steps.build.outputs.finished }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: python3 .\scripts\setup-build-tools.py
+
+      # Reuse artifact from previous job. This also avoid the need to checkout 
+      # source code again, helps in incremental build.
+      - name: Download Partially Built Chromium 
+        uses: actions/download-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
+      - name: Build
+        id: build
+        run: python3 .\scripts\build-chromium.py
+
+      - name: Volume Details
+        run: Get-Volume
+
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
+
+      - name: Upload Partial Built Chromium
+        if: ${{ steps.build.outputs.finished != 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip"
+
+  build-8:
+    if: ${{ needs.build-7.outputs.finished != 'true' }}
+    needs: build-7
+    runs-on: windows-2022
+
+    outputs:
+      finished: ${{ steps.build.outputs.finished }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Build Tools
+        run: python3 .\scripts\setup-build-tools.py
+
+      # Reuse artifact from previous job. This also avoid the need to checkout 
+      # source code again, helps in incremental build.
+      - name: Download Partially Built Chromium 
+        uses: actions/download-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip" 
+
+      - name: Download Sccache Cache
+        uses: actions/download-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip" 
+
+      - name: Build
+        id: build
+        run: python3 .\scripts\build-chromium.py
+
+      - name: Volume Details
+        run: Get-Volume
+
+      - name: Upload Sccache Cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: sccache-cache
+          path: "${{ env.SCCACHE_DIR }}.zip"
+
+      - name: Upload Partial Built Chromium
+        if: ${{ steps.build.outputs.finished != 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromium
+          path: "${{ env.CHROMIUM_PATH }}.zip"
