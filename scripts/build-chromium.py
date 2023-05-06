@@ -6,7 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
-from utils import write_github_output
+from utils import write_github_output, print_immediate
 
 
 MAX_GITHUB_ACTION_RUN_TIME_IN_SEC = int(os.getenv("MAX_BUILD_TIME", 5*60))
@@ -15,7 +15,7 @@ print("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN_SEC // 60
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
 def archive_dir(path):
-    print('Archiving build directory')
+    print_immediate('Archiving build directory')
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", "{}.zip".format(path),
@@ -24,7 +24,7 @@ def archive_dir(path):
     )
 
 def extract_dir(path):
-    print('Extracting build directory')
+    print_immediate('Extracting build directory')
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
@@ -38,16 +38,16 @@ def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     try:
         proc.wait(timeout)
     except subprocess.TimeoutExpired:
-        print("pausing execution of process {}".format(proc.pid))
+        print_immediate("pausing execution of process {}".format(proc.pid))
         for _ in range(3):
             ctypes.windll.kernel32.GenerateConsoleCtrlEvent(1, proc.pid)
             time.sleep(1)
         try:
-            print("\nwaiting for process to finish on its own")
+            print_immediate("\nwaiting for process to finish on its own")
             proc.wait(10)
         except:
             proc.kill()
-            print("\nhad to kill the build process")
+            print_immediate("\nhad to kill the build process")
     else:
         is_finished = True
 
@@ -61,8 +61,6 @@ def _run_build_process_timeout(timeout) -> bool:
     chromium_path = os.getenv("CHROMIUM_PATH", "C:\\chromium")
     # Add call to set VC variables
 
-    # cd $env:CHROMIUM_PATH\src 
-    # autoninja -C out\Default chrome
     with subprocess.Popen(
             (
                 (shutil.which("autoninja.bat") or "autoninja.bat"), 
@@ -98,5 +96,6 @@ def main():
         write_github_output("finished", "false")
     
     return 0
+
 if __name__=="__main__":
     sys.exit(main())

@@ -1,12 +1,13 @@
 import subprocess
+from utils import print_immediate 
 
 def main():
-    print("Setting up Depot tools")
+    print_immediate("Setting up Depot tools")
     _ = subprocess.run(
         ["pwsh.exe", ".\\scripts\\setup-depot-tools.ps1"],
         check=True
     )
-    print('Setting up Sccache')
+    print_immediate('Setting up Sccache')
     _ = subprocess.run(
         ["pwsh.exe", ".\\scripts\\setup-sccache.ps1"],
         check=True
