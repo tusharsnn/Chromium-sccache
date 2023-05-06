@@ -78,13 +78,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache 
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
  
       - name: Build
         id: build
@@ -128,13 +128,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache 
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
@@ -178,13 +178,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache 
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
@@ -228,13 +228,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache 
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
@@ -277,13 +277,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
@@ -326,13 +326,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
@@ -347,7 +347,7 @@ jobs:
           name: sccache-cache
           path: "${{ env.SCCACHE_DIR }}.zip"
 
-      - name: Upload Partial Built Chromium
+      - name: Upload Partially Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
@@ -375,13 +375,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip" 
+          path: "C:\\" 
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip" 
+          path: "C:\\" 
 
       - name: Build
         id: build
