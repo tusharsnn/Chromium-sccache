@@ -14,8 +14,10 @@ print("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN_SEC // 60
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
-def archive_dir(path):
-    print_immediate('Archiving {}'.format(path))
+def archive_dir(path, listdir = False):
+    print_immediate('Archiving: {}'.format(path))
+    if listdir:
+        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(path)])
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", "{}.zip".format(path),
@@ -23,8 +25,8 @@ def archive_dir(path):
         ],
     )
 
-def extract_dir(path):
-    print_immediate('Extracting {}'.format(path)) 
+def extract_dir(path, listdir = False):
+    print_immediate('Extracting: {}'.format(path)) 
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
@@ -32,6 +34,8 @@ def extract_dir(path):
         ],
     )
     os.remove("{}.zip".format(path))
+    if listdir:
+        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(path)])
 
 def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     is_finished: bool = False
@@ -88,11 +92,11 @@ def main():
 
     sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
     if finished:
-        archive_dir(sccache_cache_path)
+        archive_dir(sccache_cache_path, listdir=True)
         write_github_output("finished", "true")
     else:
         archive_dir(chromium_path)
-        archive_dir(sccache_cache_path)
+        archive_dir(sccache_cache_path, listdir=True)
         write_github_output("finished", "false")
     
     return 0
