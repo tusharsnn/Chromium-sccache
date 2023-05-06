@@ -20,3 +20,6 @@ gn gen out\Default `
     --args="symbol_level = 0" `
     --args="cc_wrapper = sccache" `
     --args="chrome_pgo_phase = 0"
+
+echo "gn build args:"
+gn args out\Default --list
