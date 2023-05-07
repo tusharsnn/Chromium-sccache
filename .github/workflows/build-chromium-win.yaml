@@ -72,6 +72,10 @@ jobs:
 
       - name: Setup Build Tools
         run: python3 .\scripts\setup-build-tools.py
+        
+      - name: Gclient
+        run: gclient
+        shell: powershell
 
       # Reuse artifact from previou job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
@@ -122,6 +126,10 @@ jobs:
 
       - name: Setup Build Tools
         run: python3 .\scripts\setup-build-tools.py
+        
+      - name: Gclient
+        run: gclient
+        shell: powershell
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
