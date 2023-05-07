@@ -47,14 +47,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
        
     
 
@@ -98,14 +98,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
         
 
   build-3:
@@ -148,14 +148,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
         
 
   build-4:
@@ -198,14 +198,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
 
 
   build-5:
@@ -248,14 +248,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
 
   build-6:
     if: ${{ needs.build-5.outputs.finished != 'true' }}
@@ -297,14 +297,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
 
   build-7:
     if: ${{ needs.build-6.outputs.finished != 'true' }}
@@ -346,14 +346,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partially Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
 
   build-8:
     if: ${{ needs.build-7.outputs.finished != 'true' }}
@@ -396,11 +396,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.SCCACHE_DIR }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
       - name: Upload Partial Built Chromium
         if: ${{ steps.build.outputs.finished != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: chromium
-          path: "${{ env.CHROMIUM_PATH }}.zip"
+          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
+ 
