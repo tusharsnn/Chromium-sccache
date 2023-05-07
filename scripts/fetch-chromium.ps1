@@ -11,8 +11,16 @@ fetch --no-history chromium
 ls $env:CHROMIUM_PATH\src
 
 cd $env:CHROMIUM_PATH\src
-gn gen out\Default `
-    --args="is_component_build=true enable_nacl=false target_cpu=x64 blink_symbol_level=0 v8_symbol_level=0 symbol_level=0 cc_wrapper=sccache chrome_pgo_phase=0"
+$args='is_component_build=true
+enable_nacl=false
+target_cpu=\"x64\"
+blink_symbol_level=0
+v8_symbol_level=0
+symbol_level=0
+cc_wrapper=\"sccache\"
+chrome_pgo_phase=0'
+$args=$args.replace("`n", " ")
+gn gen out\Default --args=$args
 
 echo "gn build args:"
-gn args out\Default --list=cc_wrapper
+cat out\Default\args.gn
