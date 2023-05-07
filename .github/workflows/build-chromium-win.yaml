@@ -78,13 +78,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          # path: "C:\\"
 
       - name: Download Sccache Cache 
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          # path: "C:\\"
  
       - name: Build
         id: build
