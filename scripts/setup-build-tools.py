@@ -13,12 +13,12 @@ def main():
         ["pwsh.exe", ".\\scripts\\setup-sccache.ps1"],
         check=True
     )
-    print_immediate("Fetching dependencies")
-    depot_tools_path = os.getenv("DEPOT_TOOLS_PATH", "C:\\depot_tools")
-    _ = subprocess.run(
-        ["{}\\gclient.bat".format(depot_tools_path)],
-        check=True
-    )
+    # print_immediate("Fetching dependencies")
+    # depot_tools_path = os.getenv("DEPOT_TOOLS_PATH", "C:\\depot_tools")
+    # _ = subprocess.run(
+    #    ["{}\\gclient.bat".format(depot_tools_path)],
+    #    check=True
+    # )
 
 if __name__ == "__main__":
     main()
