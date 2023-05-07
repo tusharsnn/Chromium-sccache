@@ -82,6 +82,7 @@ def _run_build_process_timeout(timeout) -> bool:
 def main():
     chromium_path = os.getenv("CHROMIUM_PATH", "C:\\chromium")
     artifact_path = os.getenv("ARTIFACT_PATH", "C:\\artifacts")
+    sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
 
     job_id = os.getenv("GITHUB_JOB")
     if job_id != "build-1":
@@ -89,15 +90,20 @@ def main():
         extract_dir(
             # filepath is $ARTIFACT_PATH\chromium.zip
             filepath=os.path.join(artifact_path, "chromium.zip"), 
-            # targetpath is $CHROMIUM_PATH
-            targetpath=chromium_path
+            # targetpath is parent dir of $CHROMIUM_PATH
+            targetpath=Path(chromium_path).parent
+        )
+        extract_dir(
+            # filepath is $ARTIFACT_PATH\sccache.zip
+            filepath=os.path.join(artifact_path, "sccache.zip"),
+            # targetpath is parent dir of $SCCACHE_DIR
+            targetpath=Path(sccache_cache_path).parent
         )
 
     finished = _run_build_process_timeout(
         timeout=MAX_GITHUB_ACTION_RUN_TIME_IN_SEC
     )
-
-    sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
+    
     if finished:
         archive_dir(
             # srcpath is $SCCACHE_DIR
