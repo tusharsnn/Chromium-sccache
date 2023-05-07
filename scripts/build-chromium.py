@@ -14,28 +14,28 @@ print("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN_SEC // 60
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
-def archive_dir(path, listdir = False):
-    print_immediate('Archiving: {}'.format(path))
+def archive_dir(srcpath, target_zip, listdir = False):
+    print_immediate('Archiving: {}'.format(srcpath))
     if listdir:
-        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(path)])
+        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(srcpath)])
     _ = subprocess.run(
         [
-            (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", "{}.zip".format(path),
-            "{}".format(path), "-mx=3", "-mtc=on"
+            (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", target_zip,
+            "{}".format(srcpath), "-mx=3", "-mtc=on"
         ],
     )
 
-def extract_dir(path, listdir = False):
-    print_immediate('Extracting: {}'.format(path)) 
+def extract_dir(filepath, targetpath, listdir = False):
+    print_immediate('Extracting: {}'.format(filepath)) 
     _ = subprocess.run(
         [
-            (shutil.which("7z.exe") or "7z.exe"), "x", "{}.zip".format(path),
-            "-o{}".format(Path(path).parent), # this is parent dir of archived dir
+            (shutil.which("7z.exe") or "7z.exe"), "x", filepath,
+            "-o{}".format(targetpath), # this is parent dir of archived dir
         ],
     )
-    os.remove("{}.zip".format(path))
+    os.remove("{}".format(filepath))
     if listdir:
-        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(path)])
+        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(targetpath)])
 
 def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     is_finished: bool = False
@@ -81,10 +81,17 @@ def _run_build_process_timeout(timeout) -> bool:
 
 def main():
     chromium_path = os.getenv("CHROMIUM_PATH", "C:\\chromium")
+    artifact_path = os.getenv("ARTIFACT_PATH", "C:\\artifacts")
+
     job_id = os.getenv("GITHUB_JOB")
     if job_id != "build-1":
         # continuing build from the previous job within the same workflow.
-        extract_dir(chromium_path)
+        extract_dir(
+            # filepath is $ARTIFACT_PATH\chromium.zip
+            filepath=os.path.join(artifact_path, "chromium.zip"), 
+            # targetpath is $CHROMIUM_PATH
+            targetpath=chromium_path
+        )
 
     finished = _run_build_process_timeout(
         timeout=MAX_GITHUB_ACTION_RUN_TIME_IN_SEC
@@ -92,11 +99,23 @@ def main():
 
     sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
     if finished:
-        archive_dir(sccache_cache_path, listdir=True)
+        archive_dir(
+            # srcpath is $SCCACHE_DIR
+            srcpath=sccache_cache_path,
+            # targetpath is $ARTIFACT_PATH/scchache.zip
+            target_zip=os.path.join(artifact_path, "sccache.zip"),
+        )
         write_github_output("finished", "true")
     else:
-        archive_dir(chromium_path)
-        archive_dir(sccache_cache_path, listdir=True)
+        archive_dir(
+            srcpath=chromium_path,
+            target_zip=os.path.join(artifact_path, "chromium.zip")
+        )
+        archive_dir(
+            srcpath=sccache_cache_path,
+            target_zip=os.path.join(artifact_path, "sccache.zip"),
+            listdir=True
+        )
         write_github_output("finished", "false")
     
     return 0

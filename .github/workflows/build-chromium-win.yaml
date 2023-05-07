@@ -13,6 +13,7 @@ env:
   SCCACHE_TOOL_PATH: 'C:\sccache-v0.4.2-x86_64-pc-windows-msvc'
   SCCACHE_DIR: 'C:\sccache'
   SCCACHE_CACHE_SIZE: '20G'
+  ARTIFACT_DIR: "C:\\artifacts"
 
 jobs:
   build-1:
@@ -74,18 +75,18 @@ jobs:
 
       # Reuse artifact from previou job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          # path: "C:\\"
+          path: ${{ env.ARTIFACT_DIR }}
 
-      - name: Download Sccache Cache 
+      - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          # path: "C:\\"
- 
+          path: ${{ env.ARTIFACT_DIR }}
+        
       - name: Build
         id: build
         run: python3 .\scripts\build-chromium.py
@@ -124,17 +125,17 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
-      - name: Download Sccache Cache 
+      - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
@@ -174,17 +175,17 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
-      - name: Download Sccache Cache 
+      - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
@@ -224,17 +225,17 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
-      - name: Download Sccache Cache 
+      - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
@@ -273,17 +274,17 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
@@ -322,17 +323,17 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
@@ -371,17 +372,18 @@ jobs:
 
       # Reuse artifact from previous job. This also avoid the need to checkout 
       # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium 
+      - name: Download Partially Built Chromium
         uses: actions/download-artifact@v3
         with:
           name: chromium
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
+
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
-          path: "C:\\" 
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Build
         id: build
