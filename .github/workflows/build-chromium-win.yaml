@@ -36,7 +36,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       - name: Setup build tools and fetch Chromium
@@ -81,7 +81,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       - name: Test Cache
@@ -138,7 +138,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
@@ -189,7 +189,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
@@ -241,7 +241,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
@@ -292,7 +292,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
@@ -343,7 +343,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
@@ -394,7 +394,7 @@ jobs:
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
-            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
       # fail job if cache miss
