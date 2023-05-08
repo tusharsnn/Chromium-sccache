@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 .\scripts\setup-build-tools.py
           $env:PATH="${{ env.DEPOT_TOOLS_PATH }};$env:PATH;${{ env.SCCACHE_TOOL_PATH }}"
-          pwsh .\scripts\fetch-chromium.ps1
+          .\scripts\fetch-chromium.ps1
 
       - name: Post Volume Details
         run: Get-Volume
