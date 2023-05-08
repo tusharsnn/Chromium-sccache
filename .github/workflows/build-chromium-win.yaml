@@ -84,6 +84,12 @@ jobs:
             "${{ env.CHROMIUM_PATH }}.zip"
             ${{ env.SCCACHE_TOOL_PATH }}
       
+      - name: Test Cache
+        run: |
+          ls ${{ env.DEPOT_TOOLS_PATH }}
+          ls ${{ env.SCCACHE_TOOL_PATH }}
+          ls 'C:\'
+      
       # fail job if cache miss
       - name: Check Cache
         if: steps.cache.outputs.cache-hit != 'true'
