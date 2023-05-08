@@ -88,9 +88,7 @@ def main():
     if job_id != "build-1":
         # continuing build from the previous job within the same workflow.
         extract_dir(
-            # filepath is $ARTIFACT_PATH\chromium.zip
-            filepath=os.path.join(artifact_path, "chromium.zip"), 
-            # targetpath is parent dir of $CHROMIUM_PATH
+            filepath=os.path.join(Path(chromium_path).parent, "chromium.zip"), 
             targetpath=Path(chromium_path).parent
         )
         extract_dir(
@@ -103,26 +101,19 @@ def main():
     finished = _run_build_process_timeout(
         timeout=MAX_GITHUB_ACTION_RUN_TIME_IN_SEC
     )
-    
-    if finished:
-        archive_dir(
-            # srcpath is $SCCACHE_DIR
-            srcpath=sccache_cache_path,
-            # targetpath is $ARTIFACT_PATH/scchache.zip
-            target_zip=os.path.join(artifact_path, "sccache.zip"),
-        )
-        write_github_output("finished", "true")
-    else:
+
+    archive_dir(
+        srcpath=sccache_cache_path,
+        target_zip=os.path.join(artifact_path, "sccache.zip"),
+    )
+    if not finished:
         archive_dir(
             srcpath=chromium_path,
-            target_zip=os.path.join(artifact_path, "chromium.zip")
-        )
-        archive_dir(
-            srcpath=sccache_cache_path,
-            target_zip=os.path.join(artifact_path, "sccache.zip"),
-            listdir=True
+            target_zip=os.path.join(Path(chromium_path).parent, "chromium.zip")
         )
         write_github_output("finished", "false")
+    else: 
+        write_github_output("finished", "true")
     
     return 0
 

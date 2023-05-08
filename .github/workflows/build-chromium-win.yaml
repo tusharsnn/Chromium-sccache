@@ -28,18 +28,29 @@ jobs:
         
       - name: Pre Volume Details
         run: Get-Volume
-      
-      - name: Setup Build Tools
-        run: python3 .\scripts\setup-build-tools.py
 
-      - name: Fetch Chromium
-        run: .\scripts\fetch-chromium.ps1
+      - name: Cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.SCCACHE_TOOL_PATH }}
+      
+      - name: Setup build tools and fetch Chromium
+        if: steps.cache.outputs.cache-hit != 'true'
         shell: powershell
+        run: |
+          python3 .\scripts\setup-build-tools.py
+          $env:PATH="${{ env.DEPOT_TOOLS_PATH }};$env:PATH;${{ env.SCCACHE_TOOL_PATH }}"
+          pwsh .\scripts\fetch-chromium.ps1
 
       - name: Post Volume Details
         run: Get-Volume
 
-      - name: Build
+      - name: Extract, Build, Archive
         id: build
         run: python3 .\scripts\build-chromium.py
      
@@ -48,15 +59,6 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Upload Partial Built Chromium
-        if: ${{ steps.build.outputs.finished != 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: chromium
-          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
-       
-    
 
   build-2:
     if: ${{ needs.build-1.outputs.finished != 'true' }}
@@ -70,20 +72,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Build Tools
-        run: python3 .\scripts\setup-build-tools.py
-        
-      - name: Gclient
-        run: gclient
-        shell: powershell
+      - name: Pre Volume Details
+        run: Get-Volume
 
-      # Reuse artifact from previou job. This also avoid the need to checkout 
-      # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium
-        uses: actions/download-artifact@v3
+      - name: Cache
+        id: cache
+        uses: actions/cache@v2
         with:
-          name: chromium
-          path: ${{ env.ARTIFACT_DIR }}
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.SCCACHE_TOOL_PATH }}
+      
+      # fail job if cache miss
+      - name: Check Cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: exit 1
+
+      - name: Setup Envs
+        run: |
+          echo "${{ env.DEPOT_TOOLS_PATH }}" >> "$env:GITHUB_ENV"
+          echo "${{ env.SCCACHE_TOOL_PATH }}" >> "$env:GITHUB_ENV"
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
@@ -91,7 +101,7 @@ jobs:
           name: sccache-cache
           path: ${{ env.ARTIFACT_DIR }}
         
-      - name: Build
+      - name: Extract, Build, Archive
         id: build
         run: python3 .\scripts\build-chromium.py
 
@@ -103,14 +113,6 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Upload Partial Built Chromium
-        if: ${{ steps.build.outputs.finished != 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: chromium
-          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
-        
 
   build-3:
     if: ${{ needs.build-2.outputs.finished != 'true' }}
@@ -124,20 +126,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Build Tools
-        run: python3 .\scripts\setup-build-tools.py
-        
-      - name: Gclient
-        run: gclient
-        shell: powershell
-
-      # Reuse artifact from previous job. This also avoid the need to checkout 
-      # source code again, helps in incremental build.
-      - name: Download Partially Built Chromium
-        uses: actions/download-artifact@v3
+      - name: Cache
+        id: cache
+        uses: actions/cache@v2
         with:
-          name: chromium
-          path: ${{ env.ARTIFACT_DIR }}
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            "${{ env.CHROMIUM_PATH }}.zip"
+            ${{ env.SCCACHE_TOOL_PATH }}
+      
+      # fail job if cache miss
+      - name: Check Cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: exit 1
+
+      - name: Setup Envs
+        run: |
+          echo "${{ env.DEPOT_TOOLS_PATH }}" >> "$env:GITHUB_ENV"
+          echo "${{ env.SCCACHE_TOOL_PATH }}" >> "$env:GITHUB_ENV"
 
       - name: Download Sccache Cache
         uses: actions/download-artifact@v3
@@ -157,14 +164,6 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Upload Partial Built Chromium
-        if: ${{ steps.build.outputs.finished != 'true' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: chromium
-          path: "${{ env.ARTIFACT_DIR }}\\chromium.zip"
-        
 
   build-4:
     if: ${{ needs.build-3.outputs.finished != 'true' }}
