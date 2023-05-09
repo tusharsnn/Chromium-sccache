@@ -28,16 +28,6 @@ jobs:
         
       - name: Pre Volume Details
         run: Get-Volume
-
-      - name: Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          key: build-cache-${{ github.run_id}}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
       
       - name: Setup build tools and fetch Chromium
         shell: powershell
@@ -59,6 +49,15 @@ jobs:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
+
   build-2:
     if: ${{ needs.build-1.outputs.finished != 'true' }}
     needs: build-1
@@ -74,10 +73,11 @@ jobs:
       - name: Pre Volume Details
         run: Get-Volume
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
@@ -90,11 +90,6 @@ jobs:
           ls ${{ env.SCCACHE_TOOL_PATH }}
           ls 'C:\'
       
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
-
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
@@ -119,6 +114,15 @@ jobs:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
+
   build-3:
     if: ${{ needs.build-2.outputs.finished != 'true' }}
     needs: build-2
@@ -131,21 +135,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
-
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
@@ -169,6 +169,15 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
+
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
 
   build-4:
     if: ${{ needs.build-3.outputs.finished != 'true' }}
@@ -182,21 +191,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
-
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
@@ -221,6 +226,14 @@ jobs:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
 
   build-5:
     if: ${{ needs.build-4.outputs.finished != 'true' }}
@@ -234,21 +247,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
-
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
@@ -272,6 +281,15 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
+
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
 
   build-6:
     if: ${{ needs.build-5.outputs.finished != 'true' }}
@@ -285,21 +303,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
       
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
-
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
@@ -324,6 +338,14 @@ jobs:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
 
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
   build-7:
     if: ${{ needs.build-6.outputs.finished != 'true' }}
     needs: build-6
@@ -336,20 +358,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
-      
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
 
       - name: Setup Envs
         run: |
@@ -374,6 +392,15 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
+
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
 
   build-8:
     if: ${{ needs.build-7.outputs.finished != 'true' }}
@@ -387,20 +414,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cache
+      - name: Restore Cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
+          fail-on-cache-miss: true
           key: build-cache-${{ github.run_id}}
           path: |
             ${{ env.DEPOT_TOOLS_PATH }}
             ${{ env.CHROMIUM_PATH }}.zip
             ${{ env.SCCACHE_TOOL_PATH }}
-      
-      # fail job if cache miss
-      - name: Check Cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: exit 1
 
       - name: Setup Envs
         run: |
@@ -425,3 +448,12 @@ jobs:
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip" 
+
+      - name: Save Cache
+        uses: actions/cache/save@v3
+        with:
+          key: build-cache-${{ github.run_id}}
+          path: |
+            ${{ env.DEPOT_TOOLS_PATH }}
+            ${{ env.CHROMIUM_PATH }}.zip
+            ${{ env.SCCACHE_TOOL_PATH }}
