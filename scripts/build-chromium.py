@@ -14,7 +14,7 @@ print_immediate("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
-def archive_dir(srcpaths: list[str], target_zip, listdir = False):
+def archive_dir(srcpaths, target_zip, listdir = False):
     print_immediate(
         'Archiving: {}'.format(" ".join(srcpaths))
     )
