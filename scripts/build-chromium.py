@@ -86,16 +86,16 @@ def main():
 
     job_id = os.getenv("GITHUB_JOB")
     if job_id != "build-1":
-        # continuing build from the previous job within the same workflow.
+        # extract partial-build.zip into 'C:\'
         extract_dir(
-            filepath=os.path.join(Path(chromium_path).parent, "chromium.zip"), 
-            targetpath=Path(chromium_path).parent
+            filepath=os.path.join(Path(chromium_path).parent, "partial-build.zip"), 
+            targetpath=Path(chromium_path).drive
         )
         extract_dir(
             # filepath is $ARTIFACT_PATH\sccache.zip
             filepath=os.path.join(artifact_path, "sccache.zip"),
             # targetpath is parent dir of $SCCACHE_DIR
-            targetpath=Path(sccache_cache_path).parent
+            targetpath=Path(sccache_cache_path).drive
         )
 
     finished = _run_build_process_timeout(
