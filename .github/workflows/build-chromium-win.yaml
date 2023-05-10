@@ -20,12 +20,8 @@ jobs:
   build-1:
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-    
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
@@ -48,32 +44,25 @@ jobs:
         id: build
         run: python3 .\scripts\build-chromium.py
      
-      - name: Upload Sccache Cache
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
+      - name: Upload Sccache Artifact
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
           path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
 
   build-2:
     if: ${{ needs.build-1.outputs.finished != 'true' }}
     needs: build-1
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
@@ -81,30 +70,19 @@ jobs:
 
       - name: Pre Volume Details
         run: Get-Volume
-
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-1.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
-      
-      - name: Test Cache
-        run: |
-          ls ${{ env.DEPOT_TOOLS_PATH }}
-          ls ${{ env.SCCACHE_TOOL_PATH }}
-          ls 'C:\'
       
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -121,50 +99,38 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
+          
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
         with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
 
   build-3:
     if: ${{ needs.build-2.outputs.finished != 'true' }}
     needs: build-2
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-2.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
-      
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -177,54 +143,42 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
 
   build-4:
     if: ${{ needs.build-3.outputs.finished != 'true' }}
     needs: build-3
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-3.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
       
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -237,54 +191,42 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
 
   build-5:
     if: ${{ needs.build-4.outputs.finished != 'true' }}
     needs: build-4
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-4.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
-      
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -297,54 +239,42 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
 
   build-6:
     if: ${{ needs.build-5.outputs.finished != 'true' }}
     needs: build-5
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-5.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
-      
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -357,53 +287,42 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
 
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
   build-7:
     if: ${{ needs.build-6.outputs.finished != 'true' }}
     needs: build-6
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-6.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
 
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -416,54 +335,42 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip"
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip
 
   build-8:
     if: ${{ needs.build-7.outputs.finished != 'true' }}
     needs: build-7
     runs-on: windows-2022
 
-    env:
-      cache-job-key: cache-${{ github.job }}-${{ github.run_id }}
-
     outputs:
       finished: ${{ steps.build.outputs.finished }}
-      cache-key: ${{ env.cache-job-key }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Restore Cache
-        id: cache
-        uses: actions/cache/restore@v3
-        with:
-          fail-on-cache-miss: true
-          key: ${{ needs.build-7.outputs.cache-key }}
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
 
       - name: Setup Envs
         run: |
           echo "${{ env.DEPOT_TOOLS_PATH }}" >> $env:GITHUB_PATH
           echo "${{ env.SCCACHE_TOOL_PATH }}" >> $env:GITHUB_PATH
 
-      - name: Download Sccache Cache
+      - name: Download Partial Buid Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Download Sccache Artifact
         uses: actions/download-artifact@v3
         with:
           name: sccache-cache
@@ -476,17 +383,14 @@ jobs:
       - name: Volume Details
         run: Get-Volume
 
+      - name: Upload Partial Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: partial-build
+          path: ${{ env.ARTIFACT_DIR }}\partial-build.zip
+
       - name: Upload Sccache Cache
         uses: actions/upload-artifact@v3
         with:
           name: sccache-cache
-          path: "${{ env.ARTIFACT_DIR }}\\sccache.zip" 
-
-      - name: Save Cache
-        uses: actions/cache/save@v3
-        with:
-          key: ${{ env.cache-job-key }} 
-          path: |
-            ${{ env.DEPOT_TOOLS_PATH }}
-            ${{ env.CHROMIUM_PATH }}.zip
-            ${{ env.SCCACHE_TOOL_PATH }}
+          path: ${{ env.ARTIFACT_DIR }}\sccache.zip

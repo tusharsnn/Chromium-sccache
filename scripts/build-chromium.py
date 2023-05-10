@@ -14,18 +14,24 @@ print_immediate("Max Build Time (mins): {}".format(MAX_GITHUB_ACTION_RUN_TIME_IN
 
 # we need to archive artifacts before uploading to avoid upload
 # issues. See: https://github.com/actions/upload-artifact#too-many-uploads-resulting-in-429-responses
-def archive_dir(srcpath, target_zip, listdir = False):
-    print_immediate('Archiving: {}'.format(srcpath))
+def archive_dir(srcpaths: list[str], target_zip, listdir = False):
+    print_immediate(
+        'Archiving: {}'.format(" ".join(srcpaths))
+    )
     if listdir:
-        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(srcpath)])
+        # syntax: pwsh -c ls <dir1>,<dir2>, ...
+        # ensure no trailing comma in the list of paths
+        _ = subprocess.run(
+            ["pwsh.exe", "-c", "ls", ",".join(srcpaths).strip(",")] 
+        )
     _ = subprocess.run(
         [
             (shutil.which("7z.exe") or "7z.exe"), "a", "-tzip", target_zip,
-            "{}".format(srcpath), "-mx=3", "-mtc=on"
+            *srcpaths, "-mx=3", "-mtc=on"
         ],
     )
 
-def extract_dir(filepath, targetpath, listdir = False):
+def extract_dir(filepath, targetpath):
     print_immediate('Extracting: {}'.format(filepath)) 
     _ = subprocess.run(
         [
@@ -34,8 +40,6 @@ def extract_dir(filepath, targetpath, listdir = False):
         ],
     )
     os.remove("{}".format(filepath))
-    if listdir:
-        _ = subprocess.run(["pwsh.exe", "-c", "ls", '"{}"'.format(targetpath)])
 
 def pause_execution(proc: subprocess.Popen, timeout: int) -> bool:
     is_finished: bool = False
@@ -83,19 +87,21 @@ def main():
     chromium_path = os.getenv("CHROMIUM_PATH", "C:\\chromium")
     artifact_path = os.getenv("ARTIFACT_PATH", "C:\\artifacts")
     sccache_cache_path = os.getenv("SCCACHE_DIR", "C:\\sccache")
+    depot_tools_path = os.getenv("DEPOT_TOOLS_PATH", "C:\\depot_tools")
+    sccache_tool = os.getenv("SCCACHE_TOOL_PATH", 'C:\\sccache-v0.4.2-x86_64-pc-windows-msvc')
 
     job_id = os.getenv("GITHUB_JOB")
     if job_id != "build-1":
-        # continuing build from the previous job within the same workflow.
+        # extract partial-build.zip into 'C:\'
         extract_dir(
-            filepath=os.path.join(Path(chromium_path).parent, "chromium.zip"), 
-            targetpath=Path(chromium_path).parent
+            filepath=os.path.join(artifact_path, "partial-build.zip"), 
+            targetpath=Path(chromium_path).drive
         )
         extract_dir(
             # filepath is $ARTIFACT_PATH\sccache.zip
             filepath=os.path.join(artifact_path, "sccache.zip"),
             # targetpath is parent dir of $SCCACHE_DIR
-            targetpath=Path(sccache_cache_path).parent
+            targetpath=Path(sccache_cache_path).drive
         )
 
     finished = _run_build_process_timeout(
@@ -103,13 +109,13 @@ def main():
     )
 
     archive_dir(
-        srcpath=sccache_cache_path,
+        srcpaths=[sccache_cache_path],
         target_zip=os.path.join(artifact_path, "sccache.zip"),
     )
     if not finished:
         archive_dir(
-            srcpath=chromium_path,
-            target_zip=os.path.join(Path(chromium_path).parent, "chromium.zip")
+            srcpaths=[depot_tools_path, chromium_path, sccache_tool],
+            target_zip=os.path.join(artifact_path, "partial-build.zip")
         )
         write_github_output("finished", "false")
     else: 
