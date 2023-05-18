@@ -1,0 +1,36 @@
+name: Setup MSVC
+on: workflow_dispatch
+env:
+  MSVC_INSTALLER: 'C:\Program Files (x86)\Microsoft Visual Studio\Installer'
+
+jobs:
+  setup-msvc-community:
+    runs-on: windows-2022
+    steps:
+      - name: Uninstall VS Enterprise
+        run: |
+          $vs_enterprise_path = (& "${{ env.MSVC_INSTALLER }}\vswhere.exe" -property installationPath)
+          & "${{ env.MSVC_INSTALLER }}\setup.exe" uninstall `
+            --installPath $vs_enterprise_path `
+            --quiet --norestart
+
+      - name: Volume Details
+        run: Get-Volume
+      
+      - name: Install VS Community
+        run: |
+          & "${{ env.MSVC_INSTALLER }}\setup.exe" install `
+            --productId Microsoft.VisualStudio.Product.Community `
+            --channelId VisualStudio.17.Release `
+            --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
+            --add Microsoft.VisualStudio.Workload.NativeDesktop `
+            --add Microsoft.VisualStudio.Component.VC.ATLMFC `
+            --includeRecommended `
+            --quiet --norestart
+
+      - name: Volume Details
+        run: Get-Volume
+
+
+
+
