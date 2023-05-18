@@ -7,6 +7,9 @@ jobs:
   setup-msvc-community:
     runs-on: windows-2022
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
       - name: setup msvc
         run: ./scripts/setup-msvc.ps1 -RunAsAdmin 
 
