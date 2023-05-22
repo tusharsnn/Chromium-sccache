@@ -13,7 +13,7 @@ jobs:
       - name: Install gsudo
         run: |
           choco install gsudo
-          echo "C:\tools\gsudo\Current" >> $GITHUB_PATH
+          echo "C:\tools\gsudo\Current" >> $env:GITHUB_PATH
 
       - name: setup msvc
         run: sudo ./scripts/setup-msvc.ps1
