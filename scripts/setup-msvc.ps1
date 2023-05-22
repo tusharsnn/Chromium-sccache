@@ -11,9 +11,9 @@ $vs_enterprise_path = (& "C:\Program Files (x86)\Microsoft Visual Studio\Install
     -property installationPath `
 ) 
 if ($vs_enterprise_path) {
-    echo "uninstalling: $vs_enterpise_path"
+    echo "uninstalling: $vs_enterprise_path"
     cmd /c "$env:MSVC_INSTALLER\setup.exe" uninstall `
-        --installPath $vs_enterprise_path --quiet --norestart
+        --installPath `"$vs_enterprise_path`" --quiet --norestart
 }
 cmd /c "$env:MSVC_INSTALLER\setup.exe" install `
     --productId Microsoft.VisualStudio.Product.Community `
