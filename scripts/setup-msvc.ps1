@@ -10,13 +10,13 @@ if (-not $env:MSVC_INSTALLER) {
     $env:MSVC_INSTALLER='C:\Program Files (x86)\Microsoft Visual Studio\Installer'
 }
 $vs_enterprise_url = "https://aka.ms/vs/17/release/vs_enterprise.exe"
-$vs_enterprise_url = "https://aka.ms/vs/17/release/vs_community.exe"
+$vs_community_url = "https://aka.ms/vs/17/release/vs_community.exe"
 invoke-webrequest -Uri $vs_enterprise_url -OutFile vs_enterprise.exe
 invoke-webrequest -Uri $vs_community_url -OutFile vs_community.exe
 
 "updating installers..."
-& vs_enterprise.exe --update --quiet --wait | out-default
-& vs_community.exe --update --quiet --wait | out-default
+& .\vs_enterprise.exe --update --quiet --wait | out-default
+& .\vs_community.exe --update --quiet --wait | out-default
 
 $vs_product_id = (& "$env:MSVC_INSTALLER\vswhere.exe" -property productId) 
 $vs_channel_id = (& "$env:MSVC_INSTALLER\vswhere.exe" -property channelId) 
@@ -31,7 +31,7 @@ if ($vs_product_id -eq 'Microsoft.VisualStudio.Product.Enterprise') {
     #     "--quiet"
     #     "--norestart"
     # )
-    & "vs_enterprise.exe" uninstall `
+    & ".\vs_enterprise.exe" uninstall `
         --productId $vs_product_id `
         --channelId $vs_channel_id `
         --quiet `
@@ -65,7 +65,7 @@ if ($vs_product_id -eq 'Microsoft.VisualStudio.Product.Enterprise') {
 echo "Installing VS Community edition..."
 # Start-Process "$env:MSVC_INSTALLER\setup.exe" -Wait -ArgumentList $argumentList 
 #-rso logs.txt -rse stderr.txt
-& "vs_community.exe" install `
+& ".\vs_community.exe" install `
     --productId Microsoft.VisualStudio.Product.Community `
     --channelId VisualStudio.17.Release `
     --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
