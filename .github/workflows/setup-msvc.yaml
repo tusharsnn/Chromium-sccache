@@ -9,15 +9,12 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      
+      - name: Install gsudo
+        run: choco install gsudo
 
       - name: setup msvc
-        run: ./scripts/setup-msvc.ps1
-
-      - name: Test
-        run: |
-          Start-Process pwsh -ArgumentList 'echo $env:username'
-          echo "after admin run"
-          echo "echo $env:username"
+        run: sudo ./scripts/setup-msvc.ps1
 
       - name: Volume Details
         run: Get-Volume
